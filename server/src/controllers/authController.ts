@@ -15,18 +15,22 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // Auto-assign admin role for specific email
+    const role = (email === "ankanbayen@gmail.com") ? "admin" : "user";
 
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
+        role
       },
     });
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
-    res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, credits: user.credits } });
+    res.status(201).json({ token, user: { id: user.id, name: user.name, email: user.email, credits: user.credits, role: user.role } });
   } catch (error) {
     res.status(500).json({ error: 'Error creating user' });
   }
@@ -46,9 +50,9 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, credits: user.credits } });
+    res.json({ token, user: { id: user.id, name: user.name, email: user.email, credits: user.credits, role: user.role } });
   } catch (error) {
     res.status(500).json({ error: 'Error logging in' });
   }
@@ -59,7 +63,7 @@ export const getProfile = async (req: any, res: Response) => {
     const user = await prisma.user.findUnique({ where: { id: req.user.userId } });
     if (!user) return res.status(404).json({ error: 'User not found' });
     
-    res.json({ id: user.id, name: user.name, email: user.email, credits: user.credits });
+    res.json({ id: user.id, name: user.name, email: user.email, credits: user.credits, role: user.role });
   } catch (error) {
     res.status(500).json({ error: 'Error fetching profile' });
   }

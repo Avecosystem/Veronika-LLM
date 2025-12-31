@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { api } from '../config/api';
 import { translations, Language } from '../i18n/translations';
 
 interface User {
@@ -7,6 +8,7 @@ interface User {
   name: string;
   email: string;
   credits: number;
+  role?: string;
 }
 
 interface AuthContextType {
@@ -53,7 +55,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const refreshProfile = async () => {
     try {
-      const res = await axios.get('http://localhost:5001/api/auth/profile');
+      const res = await api.get('/api/auth/profile');
       setUser(res.data);
     } catch (error) {
       console.error("Failed to refresh profile", error);
