@@ -9,6 +9,8 @@ interface Message {
   content: string;
 }
 
+import { defaultModel } from '../config/models';
+
 export const Chat: React.FC = () => {
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
@@ -40,7 +42,7 @@ export const Chat: React.FC = () => {
     try {
       const response = await axios.post('http://localhost:5001/api/chat', {
         messages: [...messages, userMessage],
-        model: 'provider-8/gpt-oss-20b'
+        model: defaultModel
       });
 
       const botMessage: Message = { 

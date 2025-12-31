@@ -20,7 +20,7 @@ export const chat = async (req: any, res: Response) => {
     const response = await axios.post(
       API_URL,
       {
-        model: model || 'provider-8/gpt-oss-20b',
+        model: model || 'openai/gpt-oss-20b:free',
         messages
       },
       {
