@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Comprehensive Netlify Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            margin: 15px 0;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-ok {
+            background-color: #27ae60;
+        }
+        .status-error {
+            background-color: #e74c3c;
+        }
+        .status-pending {
+            background-color: #f39c12;
+        }
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comprehensive Netlify Deployment Test</h1>
+    <p>This page will test all components of your Netlify deployment to ensure everything is working correctly.</p>
+    
+    <div class="test-section">
+        <h2>Deployment Status</h2>
+        <div id="deploymentStatus">
+            <p><span class="status-indicator status-pending"></span> Checking deployment status...</p>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>1. Static File Serving Test</h2>
+        <button onclick="testStaticFiles()">Test Static Files</button>
+        <div id="staticResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Netlify Functions Test</h2>
+        <button onclick="testFunctions()">Test Netlify Functions</button>
+        <div id="functionResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Chat API Test</h2>
+        <button onclick="testChatAPI()">Test Chat API</button>
+        <div id="chatResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. End-to-End Test</h2>
+        <button onclick="testEndToEnd()">Full End-to-End Test</button>
+        <div id="e2eResult" class="test-result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>5. Model Availability Test</h2>
+        <button onclick="testModels()">Test AI Models</button>
+        <div id="modelResult" class="test-result"></div>
+    </div>
+
+    <script>
+        // Check deployment status on page load
+        window.addEventListener('DOMContentLoaded', checkDeploymentStatus);
+        
+        async function checkDeploymentStatus() {
+            const statusDiv = document.getElementById('deploymentStatus');
+            try {
+                // Check if we're on Netlify
+                const isNetlify = window.location.hostname.includes('netlify.app');
+                const isLocalhost = window.location.hostname === 'localhost';
+                
+                let statusHTML = '';
+                if (isNetlify) {
+                    statusHTML = `
+                        <p><span class="status-indicator status-ok"></span> Deployed on Netlify: ${window.location.hostname}</p>
+                        <p class="info">✅ All static files and functions should be accessible</p>
+                    `;
+                } else if (isLocalhost) {
+                    statusHTML = `
+                        <p><span class="status-indicator status-ok"></span> Running on localhost</p>
+                        <p class="info">✅ Using local Flask server for API calls</p>
+                    `;
+                } else {
+                    statusHTML = `
+                        <p><span class="status-indicator status-pending"></span> Unknown deployment environment</p>
+                        <p class="info">⚠️ Some features may not work correctly</p>
+                    `;
+                }
+                
+                statusDiv.innerHTML = statusHTML;
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <p><span class="status-indicator status-error"></span> Error checking deployment status: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testStaticFiles() {
+            const resultDiv = document.getElementById('staticResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = '<p>Testing static file access...</p>';
+            
+            try {
+                // Test accessing a known static file
+                const response = await fetch('/index.html');
+                if (response.ok) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ Static Files Working</h3>
+                        <p>Successfully accessed index.html</p>
+                        <p>Static file serving is configured correctly</p>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Static Files Error</h3>
+                    <p>Failed to access static files: ${error.message}</p>
+                `;
+            }
+        }
+        
+        async function testFunctions() {
+            const resultDiv = document.getElementById('functionResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = '<p>Testing Netlify Functions...</p>';
+            
+            try {
+                const response = await fetch('/api/test');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ Netlify Functions Working</h3>
+                        <p>Function response: ${data.message}</p>
+                        <p>Timestamp: ${data.timestamp}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${data.message || data.error}`);
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Netlify Functions Error</h3>
+                    <p>Failed to call Netlify function: ${error.message}</p>
+                    <p class="info">This might indicate an issue with your netlify.toml configuration</p>
+                `;
+            }
+        }
+        
+        async function testChatAPI() {
+            const resultDiv = document.getElementById('chatResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = '<p>Testing Chat API...</p>';
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: "user", content: "Hello, this is a test message" }
+                        ],
+                        model: "openai/gpt-oss-20b:free"
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'test-result success';
+                    resultDiv.innerHTML = `
+                        <h3>✅ Chat API Working</h3>
+                        <p>Successfully connected to the AI model</p>
+                        <p>Response: ${data.choices[0].message.content.substring(0, 100)}...</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.className = 'test-result error';
+                    resultDiv.innerHTML = `
+                        <h3>❌ Chat API Error</h3>
+                        <p>Status: ${response.status}</p>
+                        <p>Message: ${data.message || data.error || 'Unknown error'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Chat API Connection Error</h3>
+                    <p>Failed to connect to Chat API: ${error.message}</p>
+                    <p class="info">This might be due to network issues or incorrect API configuration</p>
+                `;
+            }
+        }
+        
+        async function testEndToEnd() {
+            const resultDiv = document.getElementById('e2eResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = '<p>Running end-to-end test...</p>';
+            
+            try {
+                // Test 1: Static files
+                const staticResponse = await fetch('/index.html');
+                if (!staticResponse.ok) throw new Error('Static files not accessible');
+                
+                // Test 2: Functions
+                const functionResponse = await fetch('/api/test');
+                const functionData = await functionResponse.json();
+                if (!functionResponse.ok) throw new Error('Functions not working');
+                
+                // Test 3: Chat API
+                const chatResponse = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        messages: [
+                            { role: "user", content: "Test message for end-to-end check" }
+                        ],
+                        model: "openai/gpt-oss-20b:free"
+                    })
+                });
+                const chatData = await chatResponse.json();
+                if (!chatResponse.ok) throw new Error('Chat API not working');
+                
+                resultDiv.className = 'test-result success';
+                resultDiv.innerHTML = `
+                    <h3>✅ End-to-End Test Passed</h3>
+                    <p>All components are working correctly:</p>
+                    <ul>
+                        <li>Static file serving: ✅</li>
+                        <li>Netlify Functions: ✅</li>
+                        <li>Chat API connectivity: ✅</li>
+                    </ul>
+                    <p>Deployment is ready for production use!</p>
+                `;
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ End-to-End Test Failed</h3>
+                    <p>Error: ${error.message}</p>
+                    <p>Please check the individual test results above for more details</p>
+                `;
+            }
+        }
+        
+        async function testModels() {
+            const resultDiv = document.getElementById('modelResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'test-result';
+            resultDiv.innerHTML = '<p>Testing AI model availability...</p>';
+            
+            const models = [
+                "openai/gpt-oss-20b:free",
+                "minimax/minimax-m2:free",
+                "nvidia/nemotron-nano-9b-v2:free",
+                "z-ai/glm-4.5-air:free",
+                "nousresearch/hermes-3-llama-3.1-405b:free",
+                "meituan/longcat-flash-chat:free"
+            ];
+            
+            try {
+                let results = [];
+                for (const model of models) {
+                    try {
+                        const response = await fetch('/api/chat', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                messages: [
+                                    { role: "user", content: "Respond with exactly 'OK' to confirm model availability" }
+                                ],
+                                model: model
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            results.push(`✅ ${model}: Available`);
+                        } else {
+                            const data = await response.json();
+                            results.push(`❌ ${model}: ${data.message || 'Error'}`);
+                        }
+                    } catch (error) {
+                        results.push(`❌ ${model}: Connection failed`);
+                    }
+                }
+                
+                resultDiv.className = 'test-result info';
+                resultDiv.innerHTML = `
+                    <h3>AI Model Availability Results</h3>
+                    <ul>
+                        ${results.map(r => `<li>${r}</li>`).join('')}
+                    </ul>
+                `;
+            } catch (error) {
+                resultDiv.className = 'test-result error';
+                resultDiv.innerHTML = `
+                    <h3>❌ Model Test Error</h3>
+                    <p>Failed to test models: ${error.message}</p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
