@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { Search, Edit, Trash2, Check, X } from 'lucide-react';
 
 interface UserData {
-  id: number;
+  id: string;
   name: string;
   email: string;
   credits: number;
@@ -13,7 +13,7 @@ interface UserData {
 }
 
 interface PaymentRequest {
-  id: number;
+  id: string;
   user: { name: string; email: string };
   amount: number;
   utr: string;
@@ -26,7 +26,7 @@ export const AdminDashboard: React.FC = () => {
   const [payments, setPayments] = useState<PaymentRequest[]>([]);
   const [activeTab, setActiveTab] = useState<'users' | 'payments'>('users');
   const [searchTerm, setSearchTerm] = useState('');
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editCredits, setEditCredits] = useState<number>(0);
   const { user } = useAuth();
 
@@ -63,7 +63,7 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleUpdateCredits = async (id: number) => {
+  const handleUpdateCredits = async (id: string) => {
     try {
       await api.put(`/api/admin/users/${id}/credits`, { credits: editCredits });
       setUsers(users.map(u => u.id === id ? { ...u, credits: editCredits } : u));
@@ -73,7 +73,7 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleDeleteUser = async (id: number) => {
+  const handleDeleteUser = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
       await api.delete(`/api/admin/users/${id}`);

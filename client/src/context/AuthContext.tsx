@@ -4,7 +4,7 @@ import { api } from '../config/api';
 import { translations, Language } from '../i18n/translations';
 
 interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
   credits: number;

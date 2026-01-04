@@ -28,7 +28,7 @@ export const updateUserCredits = async (req: Request, res: Response) => {
     const { credits } = req.body;
 
     const updatedUser = await prisma.user.update({
-      where: { id: Number(id) },
+      where: { id: id },
       data: { credits: Number(credits) }
     });
 
@@ -45,11 +45,11 @@ export const deleteUser = async (req: Request, res: Response) => {
 
     // Delete related credit history first (optional, but good practice if cascade isn't set)
     await prisma.creditHistory.deleteMany({
-      where: { userId: Number(id) }
+      where: { userId: id }
     });
 
     await prisma.user.delete({
-      where: { id: Number(id) }
+      where: { id: id }
     });
 
     res.json({ message: 'User deleted successfully' });

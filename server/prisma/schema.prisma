@@ -3,12 +3,12 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   name      String
   password  String
@@ -20,17 +20,17 @@ model User {
 }
 
 model CreditHistory {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   amount    Int
   reason    String
   date      DateTime @default(now())
-  userId    Int
+  userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
 }
 
 model PaymentRequest {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id])
   amount    Int
   utr       String   @unique

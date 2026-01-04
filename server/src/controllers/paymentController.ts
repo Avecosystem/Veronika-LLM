@@ -75,7 +75,7 @@ export const updatePaymentStatus = async (req: Request, res: Response) => {
     }
 
     const payment = await prisma.paymentRequest.findUnique({
-      where: { id: Number(id) }
+      where: { id: id }
     });
 
     if (!payment) {
@@ -90,7 +90,7 @@ export const updatePaymentStatus = async (req: Request, res: Response) => {
     await prisma.$transaction(async (prisma) => {
       // Update payment status
       await prisma.paymentRequest.update({
-        where: { id: Number(id) },
+        where: { id: id },
         data: { status }
       });
 
