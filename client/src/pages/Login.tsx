@@ -23,9 +23,8 @@ export const Login: React.FC = () => {
     } catch (err: any) {
       console.error('Login error:', err);
       setError(
-        err.response?.data?.error || 
-        err.message || 
-        'Login failed. Please check your connection and try again.'
+        (err.response?.data?.error || err.message) + 
+        (err.response?.status === 404 ? ' - Server endpoint not found. Please check if the backend is running.' : '')
       );
     } finally {
       setLoading(false);
