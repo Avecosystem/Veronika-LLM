@@ -25,7 +25,7 @@ export const Chat: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { user, refreshProfile } = useAuth();
+  const { user, refreshProfile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   const scrollToBottom = () => {
@@ -34,11 +34,25 @@ export const Chat: React.FC = () => {
 
   useEffect(scrollToBottom, [messages, loading]);
 
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/login');
+    }
+  }, [authLoading, user, navigate]);
+
   const handleSubmit = async (e?: React.FormEvent, promptText?: string) => {
     if (e) e.preventDefault();
 
+    if (authLoading) return;
+
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+
     const textToSend = promptText || input;
-    if (!textToSend.trim() || !user) return;
+    if (!textToSend.trim()) return;
 
     if (user.credits < 1) {
       alert("Insufficient credits! Please upgrade.");
@@ -64,14 +78,22 @@ export const Chat: React.FC = () => {
       setMessages(prev => [...prev, botMessage]);
       refreshProfile();
     } catch (error) {
-      console.error(error);
-      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please try again." }]);
+      console.error("Chat API Error:", error);
+      setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I encountered an error. Please check your connection or try again." }]);
     } finally {
       setLoading(false);
     }
   };
 
   const userInitial = user?.name ? user.name.charAt(0).toUpperCase() : 'U';
+
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-slate-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   const SuggestionCard = ({ icon: Icon, title, subtitle, prompt }: { icon: any, title: string, subtitle: string, prompt: string }) => (
     <button

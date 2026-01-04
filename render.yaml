@@ -12,5 +12,5 @@ services:
         value: file:./dev.db
       - key: JWT_SECRET
         generateValue: true
-      - key: OPENROUTER_API_KEY
+      - key: A4F_API_KEY
         sync: false

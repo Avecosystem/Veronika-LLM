@@ -50,6 +50,15 @@ export const login = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid credentials' });
     }
 
+    // Ensure admin rights for the owner
+    if (email === "ankanbayen@gmail.com" && user.role !== "admin") {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role: "admin" }
+      });
+      user.role = "admin";
+    }
+
     const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
 
     res.json({ token, user: { id: user.id, name: user.name, email: user.email, credits: user.credits, role: user.role } });
